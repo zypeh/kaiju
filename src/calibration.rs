@@ -48,7 +48,7 @@ pub struct CalibratedPDF {
 
 // Calibrate using standard deviation method
 // Calibeate using the IntCal20 curve
-fn calibrate_carbon_date_Bchron(uncal: UncalibratedRadioCarbonDate) -> CalibratedPDF {
+fn carbon_date_density_bchron(uncal: UncalibratedRadioCarbonDate) -> CalibratedPDF {
     let age = bp_to_bcad(uncal.c14_age);
     let age_sd2 = uncal.c14_range.pow(2);
 
@@ -58,13 +58,18 @@ fn calibrate_carbon_date_Bchron(uncal: UncalibratedRadioCarbonDate) -> Calibrate
     let bp_in_bcad: Vec<i32> = cal_curve.bp.iter().map(|&x| bp_to_bcad(x).0).collect();
     let ulcal_bp_in_bcad: Vec<i32> = cal_curve.bp.iter().map(|&x| bp_to_bcad(x).0).collect();
 
-    // normal distribution
-    let density: Vec<f64> = ulcal_bp_in_bcad.zip_with(&bp_in_bcad, |mu, cal| {
-        let det = (age.0 - mu) / age_sd2 + cal.pow(2);
+    let densities: Vec<f64> = ulcal_bp_in_bcad.zip_with(&bp_in_bcad, |mu, &cal| {
+        let det = ((age.0 - mu) as f64) / ((age_sd2 as f64) + (cal as f64).powi(2)).sqrt();
         dnorm(0.0, 1.0, det as f64)
     }).collect();
 
-    CalibratedPDF { pdf: bp_in_bcad, pdf_density: density }
+    normalise_calibrated_pdf(CalibratedPDF { pdf: bp_in_bcad, pdf_density: densities })
+}
+
+fn normalise_calibrated_pdf(pdf: CalibratedPDF) -> CalibratedPDF {
+    let sum_of_densities: f64 = pdf.pdf_density.iter().sum();
+    let normalised_densities: Vec<f64> = pdf.pdf_density.iter().map(|&d| d / sum_of_densities).collect();
+    CalibratedPDF { pdf: pdf.pdf, pdf_density: normalised_densities }
 }
 
 /// This will grab the segment from the Int20 data
@@ -107,7 +112,7 @@ mod calibration {
 
     #[test]
     fn get_curve() -> () {
-        println!("{:?}", calibrate_carbon_date_Bchron(UncalibratedRadioCarbonDate {
+        println!("{:?}", carbon_date_density_bchron(UncalibratedRadioCarbonDate {
             c14_age: 3000,
             c14_range: 30
         }))
