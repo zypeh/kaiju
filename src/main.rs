@@ -8,7 +8,7 @@ use clap::Parser;
 #[derive(Parser, Debug)]
 #[clap(author, version, about, long_about = None)]
 struct Args {
-    /// Name of the person to greet
+    /// Before Present years
     #[clap(short, long)]
     year: u32,
 
