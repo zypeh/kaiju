@@ -26,9 +26,9 @@ fn bp_to_bcad (bp: YearBP) -> YearInBCOrAD { YearInBCOrAD(1950 - (bp as i32)) }
 #[derive(Debug, PartialEq, Eq)]
 pub struct UncalibratedRadioCarbonDate {
     /// C_14 age in years BP
-    c14_age: YearBP,
+    pub c14_age: YearBP,
     /// sigma in years, also served as standard deviation
-    c14_range: YearRange,
+    pub c14_range: YearRange,
 }
 
 /// Just a slice to const static Int20 curve
@@ -48,7 +48,7 @@ pub struct CalibratedPDF {
 
 // Calibrate using standard deviation method
 // Calibeate using the IntCal20 curve
-fn carbon_date_density_bchron(uncal: UncalibratedRadioCarbonDate) -> CalibratedPDF {
+pub fn carbon_date_density_bchron(uncal: UncalibratedRadioCarbonDate) -> CalibratedPDF {
     let age = bp_to_bcad(uncal.c14_age);
     let age_sd2 = uncal.c14_range.pow(2);
 
