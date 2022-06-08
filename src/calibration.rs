@@ -24,10 +24,10 @@ pub struct CalibratedCurveInBP<'a> {
 }
 
 /// `pdf` stands for probability density function
-// pub struct CalibratedPDF {
-//     pdf: Vec<YearInBCOrAD>,
-//     pdf_density: Vec<f64>,
-// }
+pub struct CalibratedPDF {
+    pdf: Vec<YearInBCOrAD>,
+    pdf_density: Vec<f64>,
+}
 
 // Calibrate using standard deviation method
 // Calibeate using the IntCal20 curve
